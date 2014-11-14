@@ -1,0 +1,115 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(GML)package gml;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+
+import parsetools.KeyValueObject;
+
+public class GML{//  public static void main(String args []) throws ParseException, FileNotFoundException//  {//    GML parser = new GML(new FileInputStream("/home/symons/Desktop/graphparsers/gml/e1.gml"));//	KeyValueObject o=GML.topLevel();//	System.out.println("Parsed 1 ok");//	ReInit(new FileInputStream("/home/symons/Desktop/graphparsers/gml/e2.gml"));////	GML.topLevel();//	System.out.println("Parsed 2 ok");//	//    ReInit(new FileInputStream("/home/symons/Desktop/graphparsers/gml/e3.gml"));//	GML.topLevel();//	System.out.println("Parsed 3 ok");//    ReInit(new FileInputStream("/home/symons/Dropbox/Projects/Laubfrosch/intarnaUrlaub_many_joined.out_thres-1-2percent_yedited-g0-3red.gml"));//	GML.topLevel();//	System.out.println("Parsed 4 ok");//	ReInit(new FileInputStream("/home/symons/Dropbox/Projects/Laubfrosch/intarnaUrlaub_many_joined.out_thres-1-2percent_yedited-g0-3red_hubsOnly.gml"));//	GML.topLevel();//	System.out.println("Parsed 5 ok");//	ReInit(new FileInputStream("/home/symons/Dropbox/Projects/Laubfrosch/intarnaUrlaub_many_joined.out_thres-1-2percent_yedited-g0-3red_scoHubs-g6.gml"));//	GML.topLevel();//	System.out.println("Parsed 6 ok");//	//	ReInit(new FileInputStream("/home/symons/Dropbox/Projects/Laubfrosch/small.gml"));//	GML.topLevel();//	System.out.println("Parsed 7 ok");//	ReInit(new FileInputStream("/home/symons/Dropbox/Projects/Laubfrosch/small2.gml"));//	GML.topLevel();//System.out.println("Parsed 8 ok");
+	
+//    while (true)//    {//      System.out.println("Reading from standard input...");//      System.out.print("Enter an expression like \u005c"1+(2+3)*4;\u005c" :");//      try//      {//        GML.topLevel();//      }//      catch (Exception e)//      {//		e.printStackTrace();//        ReInit(System.in);//      }//      catch (Error e)//      {//        System.out.println("Oops.");//        System.out.println(e.getMessage());//        break;//      }//    }
+
+    //    GML parser = new GML(System.in);//    while (true)//    {//      System.out.println("Reading from standard input...");//      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");//      try//      {//        GML.topLevel();//      }//      catch (Exception e)//      {//        System.out.println("NOK.");//        System.out.println(e.getMessage());//        ReInit(System.in);//      }//      catch (Error e)//      {//        System.out.println("Oops.");//        System.out.println(e.getMessage());//        break;//      }//    }//  }}PARSER_END(GML)SKIP :{  " "| "\r"| "\t"| "\n"}
+
+
+MORE : {
+
+    "#": IN_SINGLE_LINE_COMMENT }
+
+      
+< IN_SINGLE_LINE_COMMENT > SPECIAL_TOKEN : {
+
+    < SINGLE_LINE_COMMENT: "\n"|"\r"|"\r\n" > : DEFAULT }
+
+      
+< IN_SINGLE_LINE_COMMENT > MORE : {
+
+    <  ~[] > } 
+TOKEN : {  <LEFTB: "["> }
+TOKEN : {  <RIGHTB: "]">}
+TOKEN : { < KEY: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"] )* > }
+
+
+TOKEN : { < STRING: "\""< INSTRING > "\"">}
+TOKEN:{ < #INSTRING : (
+    ["a"-"z","A"-"Z","0"-"9",
+    " ",
+    "!","\"","#","$","%","&","'","(",")","*","+",",","-",".","/",
+    ":",";","<","=",">","?","@","[","\\","]","^","_","`","{","|","}","~"])* >
+}
+
+TOKEN : { < #DIGIT : (["0"-"9"]) > }
+TOKEN : { < INTEGER : <SIGN>(<DIGIT>)+>}
+TOKEN : { < #SIGN : (["+","-"])?>}
+TOKEN : { < REAL : <SIGN>(<DIGIT>)*"."(<DIGIT>)* <MANTISSA> > }
+TOKEN : { < #MANTISSA: ""|"E" <SIGN><DIGIT> >}
+
+KeyValueObject topLevel():
+{
+	KeyValueObject root;
+}
+{
+	root=list() < EOF >
+	{		return root;
+	}
+}
+
+KeyValueObject list():
+{
+	Token t;
+	KeyValueObject listObject;
+	String key=null;
+	Object o=null;	
+}
+{
+	{
+	  listObject=new KeyValueObject();	}
+  
+  (     t=< KEY >
+     {
+       key=t.image;
+//       System.out.println(key);     }
+     o=value()
+     {
+//        System.out.println(key+"\t"+o.toString());		if(o instanceof KeyValueObject)
+		{
+		   KeyValueObject kvo=(KeyValueObject)o;
+		   kvo.setKey(key);			listObject.addChild(kvo);
+		}else
+		{
+		  listObject.put(key,o.toString());
+//		  System.out.println(key+"\t"+o.toString());
+		}
+     }
+      )*  
+    {		return listObject;
+   	}}
+
+Object value():
+{
+	Token t;
+	Object o;
+}
+{
+  t=< INTEGER >  {
+//    System.out.println("\tI"+t.image);    return t.image;  }   |
+  t=< REAL >   {
+    return t.image;
+  }
+  |
+  t=< STRING >
+  {
+//    System.out.println("\tS"+t.image);
+    return t.image;
+  } |
+  < LEFTB > o=list()< RIGHTB >
+ {
+	  return o;
+}
+
+}
+
+

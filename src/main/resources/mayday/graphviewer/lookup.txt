@@ -1,0 +1,7 @@
+PMID	http://www.ncbi.nlm.nih.gov/pubmed/@1
+PubMed	http://www.ncbi.nlm.nih.gov/pubmed/@1
+NCBI	http://www.ncbi.nlm.nih.gov/gquery/?term=@1
+UniProt	http://www.uniprot.org/uniprot/@1
+Entrez	http://www.ncbi.nlm.nih.gov/gquery/?term=@1
+PubChem	http://www.ncbi.nlm.nih.gov/sites/entrez?db=pccompound&term=@1
+LIGAND	http://www.genome.jp/dbget-bin/www_bget?@1
