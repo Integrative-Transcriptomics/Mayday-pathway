@@ -1,0 +1,30 @@
+SBOTerm	SBGNRole
+SBO:0000285	Unspecified Entity
+SBO:0000247	Simple Chemical
+SBO:0000245	Macromolecule
+SBO:0000354	Nucleic Acid Feature
+SBO:0000420	Multimer Macromolecule
+SBO:0000418	Multimer Complex
+SBO:0000419	Multimer Nucleic Acid Feature
+SBO:0000421	Multimer Simple Chemical
+SBO:0000253	Complex
+SBO:0000291	Source
+SBO:0000405	Pertubing agent
+SBO:0000375	Process
+SBO:0000397	Omitted Process
+SBO:0000396	Uncertain Process
+SBO:0000177	Association
+SBO:0000180	Dissociation
+SBO:0000358	Phenotype
+SBO:0000394	Consumption
+SBO:0000393	Production
+SBO:0000168	Modulation
+SBO:0000170	Stimulation
+SBO:0000172	Catalysis
+SBO:0000169	Inhibition
+SBO:0000171	Trigger
+SBO:0000398	Logic
+SBO:0000173	Logic AND
+SBO:0000174	Logic OR
+SBO:0000238	Logic NOT
+SBO:0000014 Macromolecule

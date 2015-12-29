@@ -1,0 +1,1 @@
+ftp://ftp.genome.jp/pub/kegg/xml/kgml/metabolic/organisms/

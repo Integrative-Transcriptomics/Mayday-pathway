@@ -1,0 +1,3 @@
+ko	ftp://ftp.genome.jp/pub/kegg/genes/ko
+compound	ftp://ftp.genome.jp/pub/kegg/ligand/compound/compound
+map_title.tab	ftp://ftp.genome.jp/pub/kegg/pathway/map_title.tab
