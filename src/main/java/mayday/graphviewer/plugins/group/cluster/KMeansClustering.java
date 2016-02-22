@@ -77,7 +77,7 @@ public class KMeansClustering  extends AbstractGraphViewerPlugin
 				catch ( Exception exception ) {
 					exception.printStackTrace();			    	           
 					JOptionPane.showMessageDialog( null,
-							exception.getMessage(),
+							exception.toString(),
 							MaydayDefaults.Messages.ERROR_TITLE,
 							JOptionPane.ERROR_MESSAGE );
 				}
