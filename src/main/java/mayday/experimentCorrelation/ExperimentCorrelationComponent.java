@@ -14,7 +14,9 @@ import mayday.core.Probe;
 import mayday.core.ProbeListEvent;
 import mayday.core.ProbeListListener;
 import mayday.core.settings.SettingDialog;
+import mayday.core.settings.generic.HierarchicalSetting;
 import mayday.core.settings.generic.ObjectSelectionSetting;
+import mayday.core.settings.typed.BooleanSetting;
 import mayday.graphviewer.statistics.Correlations;
 import mayday.vis3.model.Visualizer;
 import mayday.vis3.tables.AbstractTabularComponent;
@@ -26,6 +28,7 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 	double[][] corMatrix;
 
 	String metric;
+	boolean correlateExperiments;
 
 	/**
 	 * @author stoppel
@@ -33,8 +36,8 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 	public double[][] transposeMatrix(double [][] matrix){
 		double[][] transposed = new double[matrix[0].length][matrix.length];
 		for (int i = 0; i < matrix.length; i++)
-		for (int j = 0; j < matrix[0].length; j++)
-		transposed[j][i] = matrix[i][j];
+			for (int j = 0; j < matrix[0].length; j++)
+				transposed[j][i] = matrix[i][j];
 		return transposed;
 
 		}
@@ -76,31 +79,11 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 	
 		for(int i = 0; i < matrix.length; i++){ //iterate over experiments
 			for(int j = 0; j < matrix.length; j++){ //for each experiment calculate correlation to each other
-				res[i][j] = getCorrelation(matrix[i], matrix[j], getCalcSetting());
+				res[i][j] = getCorrelation(matrix[i], matrix[j], metric);
 			}
 		}
 		corMatrix = res;
 		return res;
-	}
-	
-	/**
-	 * @author stoppel
-	 */
-	private String getCalcSetting() {
-		if (metric == null) {
-			// ask user for correlation metric
-			ObjectSelectionSetting<String> method
-					= new ObjectSelectionSetting<>("Correlation metric", null,
-					0, new String[] {"pearson", "spearman", "covariance"});
-			SettingDialog sd = new SettingDialog(null, "Choose the metric", method);
-			sd.showAsInputDialog();
-			/* sorry, we are below the point-of-return
-			if (sd.canceled()) {
-				return null;
-			}*/
-			metric = method.getObjectValue();
-		}
-		return metric;
 	}
 	
 	/**
@@ -113,7 +96,12 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 			temp[i] = pb.getValues();
 			i++;
 		}
-		return transposeMatrix(temp);
+
+		if (correlateExperiments) {
+			return transposeMatrix(temp);
+		} else {
+			return temp;
+		}
 	}
 
 	/**
@@ -134,30 +122,57 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 			}
 		}
 	}
-	
+
+	/**
+	 * Ask user for settings
+	 */
+	private void askSettings() {
+		HierarchicalSetting hs = new HierarchicalSetting("Settings");
+
+		// ask user for correlation metric
+		ObjectSelectionSetting<String> method
+				= new ObjectSelectionSetting<>("Correlation metric", null,
+				0, new String[] {"pearson", "spearman", "covariance"});
+
+		// ask wheter to correlate experiments or probes
+		BooleanSetting bs = new BooleanSetting("Correlate Experiments", null, true);
+
+		hs.addSetting(method).addSetting(bs);
+
+		SettingDialog sd = new SettingDialog(null, "Settings", hs);
+		sd.showAsInputDialog();
+		metric = method.getObjectValue();
+		correlateExperiments = bs.getBooleanValue();
+	}
+
 	/**
 	 * Initializes the view.
 	 * Overriden by Alexander Stoppel
 	 */
 	@Override
 	protected void init()
-	{  	
+	{
+		askSettings();
 		// columns are set to their preferred width
 		setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
 		
 		DefaultTableModel l_tableData = new DefaultTableModel(); // first index: row, second index: column
 		
 		// add columns to the model
-		l_tableData.addColumn( "Experiment #" );		
 		addColumns(l_tableData);
-		
-		int row=0;
+
 		Object[] l_row = new Object[l_tableData.getColumnCount()];
 		
 		corMatrix = getCorrelationMatrix(getOriginalProbeMatrix());
 		for(int i = 0; i < corMatrix.length; i++){
-			l_row[0] = ++row;
-			fillRow(l_row, null, row-1);
+			MasterTable mt = visualizer.getViewModel().getDataSet().getMasterTable();
+			if (correlateExperiments) {
+				l_row[0] = mt.getExperimentDisplayName( i );
+			} else {
+				l_row[0] = probes.get(i).getDisplayName();
+			}
+
+			fillRow(l_row, null, i);
 			l_tableData.addRow( l_row );   
 		}
 		
@@ -182,19 +197,6 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 		} catch (Exception dieKraetze) {
 			// too bad, no tooltips for you sir.
 		}
-		
-//		No MouseListener available/necessary. 		
-//		addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent e) {
-//				if (e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON1) {
-//					int r = rowAtPoint(e.getPoint());
-//					Probe p = (Probe)getModel().getValueAt(r,PROBECOL);
-//					if (p!=null)
-//						PropertiesDialogFactory.createDialog(p).setVisible(true);
-//				}
-//			}
-//		});
-		
 	}
 
 	
@@ -207,8 +209,17 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 	
 	protected void addColumns(DefaultTableModel tm) {
 		MasterTable masterTable = visualizer.getViewModel().getDataSet().getMasterTable();
-		for ( int i = 0; i < masterTable.getNumberOfExperiments(); ++i ) 
-			tm.addColumn( masterTable.getExperimentDisplayName( i ) );
+		if (correlateExperiments) {
+			tm.addColumn( "Experiment #" );
+			for (int i = 0; i < masterTable.getNumberOfExperiments(); ++i) {
+				tm.addColumn(masterTable.getExperimentDisplayName(i));
+			}
+		} else {
+			tm.addColumn( "ProbeSets" );
+			for (int i = 0; i < probes.size(); i++) {
+				tm.addColumn(probes.get(i).getDisplayName());
+			}
+		}
 	}
 	
 

@@ -14,7 +14,7 @@ import mayday.vis3.tables.TablePlugin;
  * Source: compare level2.mayday.vis3.plots.distancematrix (Jennifer Lange)
  */
 
-public class ExperimentCorrelationPlugin extends TablePlugin {
+public class CorrelationPlugin extends TablePlugin {
 
 	public void init() {}
 
@@ -23,14 +23,14 @@ public class ExperimentCorrelationPlugin extends TablePlugin {
 	public PluginInfo register() throws PluginManagerException {
 		PluginInfo pli = new PluginInfo(
 				(Class)this.getClass(),
-				"IT.vis3.ExperimentCorrelationMatrix",
+				"IT.vis3.CorrelationMatrix",
 				new String[0],
 				MC,
 				new HashMap<String, Object>(),
 				"Alexander Stoppel",
 				"stoppel@informatik.uni-tuebingen.de",
 				"Displays experiment-experiment correlation for all experiments as table",
-				"Experiment Correlation"
+				"Correlation Matrix"
 				);
 		//To be adapted
 		pli.setIcon("mayday/vis3/DistanceMatrix128.png");
