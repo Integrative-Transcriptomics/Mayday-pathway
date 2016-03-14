@@ -13,6 +13,8 @@ import mayday.core.MasterTable;
 import mayday.core.Probe;
 import mayday.core.ProbeListEvent;
 import mayday.core.ProbeListListener;
+import mayday.core.settings.SettingDialog;
+import mayday.core.settings.generic.ObjectSelectionSetting;
 import mayday.graphviewer.statistics.Correlations;
 import mayday.vis3.model.Visualizer;
 import mayday.vis3.tables.AbstractTabularComponent;
@@ -22,7 +24,9 @@ import mayday.vis3.tables.AbstractTabularComponent;
 public class ExperimentCorrelationComponent extends AbstractTabularComponent implements ProbeListListener
 {
 	double[][] corMatrix;
-	
+
+	String metric;
+
 	/**
 	 * @author stoppel
 	 */
@@ -83,8 +87,20 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 	 * @author stoppel
 	 */
 	private String getCalcSetting() {
-		//get settings for calculating the matrix. Where? - No idea. 
-		return "pearson";
+		if (metric == null) {
+			// ask user for correlation metric
+			ObjectSelectionSetting<String> method
+					= new ObjectSelectionSetting<>("Correlation metric", null,
+					0, new String[] {"pearson", "spearman", "covariance"});
+			SettingDialog sd = new SettingDialog(null, "Choose the metric", method);
+			sd.showAsInputDialog();
+			/* sorry, we are below the point-of-return
+			if (sd.canceled()) {
+				return null;
+			}*/
+			metric = method.getObjectValue();
+		}
+		return metric;
 	}
 	
 	/**
