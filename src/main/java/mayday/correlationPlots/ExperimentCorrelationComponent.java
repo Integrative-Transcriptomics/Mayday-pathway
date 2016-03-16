@@ -1,4 +1,4 @@
-package mayday.experimentCorrelation;
+package mayday.correlationPlots;
 import java.lang.reflect.Method;
 
 import javax.swing.JLabel;
@@ -9,10 +9,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import mayday.core.MasterTable;
-import mayday.core.Probe;
-import mayday.core.ProbeListEvent;
-import mayday.core.ProbeListListener;
+import mayday.core.*;
 import mayday.core.settings.SettingDialog;
 import mayday.core.settings.generic.HierarchicalSetting;
 import mayday.core.settings.generic.ObjectSelectionSetting;
@@ -29,6 +26,7 @@ public class ExperimentCorrelationComponent extends AbstractTabularComponent imp
 
 	String metric;
 	boolean correlateExperiments;
+
 
 	/**
 	 * @author stoppel

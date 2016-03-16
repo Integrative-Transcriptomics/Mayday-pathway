@@ -1,4 +1,4 @@
-package mayday.experimentCorrelation;
+package mayday.correlationPlots;
 
 
 import java.awt.event.ActionEvent;

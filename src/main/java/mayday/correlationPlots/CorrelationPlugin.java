@@ -1,4 +1,4 @@
-package mayday.experimentCorrelation;
+package mayday.correlationPlots;
 
 import java.util.HashMap;
 
@@ -29,7 +29,7 @@ public class CorrelationPlugin extends TablePlugin {
 				new HashMap<String, Object>(),
 				"Alexander Stoppel",
 				"stoppel@informatik.uni-tuebingen.de",
-				"Displays experiment-experiment correlation for all experiments as table",
+				"Displays correlation between Probes or Experiments as a table",
 				"Correlation Matrix"
 				);
 		//To be adapted
