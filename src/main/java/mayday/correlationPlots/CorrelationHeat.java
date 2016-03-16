@@ -1,5 +1,7 @@
 package mayday.correlationPlots;
 
+import com.sun.codemodel.internal.JOp;
+import jdk.nashorn.internal.scripts.JO;
 import mayday.core.*;
 import mayday.core.pluginrunner.ProbeListPluginRunner;
 import mayday.core.pluma.PluginInfo;
@@ -10,6 +12,7 @@ import mayday.vis3.VisualizationMenu;
 import mayday.vis3.model.Visualizer;
 import mayday.vis3.plots.heatmap2.HeatMap;
 
+import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.List;
@@ -28,6 +31,19 @@ public class CorrelationHeat extends PlotPlugin {
     @Override
     public java.util.List<ProbeList> run(java.util.List<ProbeList> probeLists,
                                          MasterTable masterTable) {
+
+        assert probeLists.size() == 0;
+        final int limit = 100;
+        if (probeLists.get(0).getNumberOfProbes() > limit) {
+            int x = JOptionPane.showConfirmDialog(null,
+                    "You have selected a probelist with over " + limit +
+                    "probes. If you correlate on Probes, Mayday might crash! " +
+                            "Still continune?", "",
+                    JOptionPane.OK_CANCEL_OPTION);
+            if (x == JOptionPane.CANCEL_OPTION) {
+                return null;
+            }
+        }
         /*
          * Compute Correlation Matrix
          */
@@ -38,23 +54,32 @@ public class CorrelationHeat extends PlotPlugin {
         /*
          * Transform matrix to a Probe-List
          */
-        ProbeList data = new ProbeList(masterTable.getDataSet(), true);
+        DataSet ds = new DataSet();
+        MasterTable tmt = new MasterTable(ds);
+        ProbeList data = new ProbeList(ds, true);
         // Add Experiment Names
+        for (int col=1; col < corMatrix.getColumnCount(); col++) {
+            tmt.addExperiment(new Experiment(tmt,
+                    corMatrix.getColumnName(col)));
+
+        }
+        // iterate over matrix
         // -1 because first column is meta info
         int nrExperiments = corMatrix.getColumnCount() - 1;
-        // retrieve values
         for (int row=0; row < corMatrix.getRowCount(); row++) {
+            // create probe
             String name = (String) corMatrix.getValueAt(row, 0);
-            // link of p to masterTable will not distube as long as we do not directly add it
-            Probe p = new Probe(masterTable, false);
+            Probe p = new Probe(tmt, false);
             p.setName(name);
+            data.addProbe(p);
+            tmt.addProbe(p);
+            // retrieve values
             double[] values = new double[nrExperiments];
             for (int i=0; i < nrExperiments; i++) {
-                // +1 shift because of name column
+                // +1 shift because of row index column
                 values[i] = (double) corMatrix.getValueAt(row, i + 1);
             }
             p.setValues(values);
-            data.addProbe(p);
         }
         /*
          * Use Heatmap plugin to display 'correlation probe-list'
@@ -62,8 +87,11 @@ public class CorrelationHeat extends PlotPlugin {
         PluginInfo heatmap = PluginManager.getInstance().getPluginFromID(HeatMap.PluginID);
         ArrayList<ProbeList> pl = new ArrayList<>();
         pl.add(data);
-        VisualizationMenu.runVisPlugin(heatmap, pl);
-        // TODO find heatmap plugin
+        /*
+         * Run Heatmap plugin with correlation data
+         */
+        ProbeListPluginRunner plpr = new ProbeListPluginRunner(heatmap, pl, ds);
+        plpr.execute();
         return null;
     }
 
