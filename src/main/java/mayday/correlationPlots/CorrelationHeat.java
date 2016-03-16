@@ -1,21 +1,17 @@
 package mayday.correlationPlots;
 
-import com.sun.codemodel.internal.JOp;
-import jdk.nashorn.internal.scripts.JO;
 import mayday.core.*;
 import mayday.core.pluginrunner.ProbeListPluginRunner;
 import mayday.core.pluma.PluginInfo;
 import mayday.core.pluma.PluginManager;
 import mayday.core.pluma.PluginManagerException;
 import mayday.vis3.PlotPlugin;
-import mayday.vis3.VisualizationMenu;
 import mayday.vis3.model.Visualizer;
 import mayday.vis3.plots.heatmap2.HeatMap;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.List;
 import java.util.*;
 
 /**
