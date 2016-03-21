@@ -1,5 +1,6 @@
 package mayday.correlationPlots;
 
+import jdk.nashorn.internal.scripts.JO;
 import mayday.core.*;
 import mayday.core.pluginrunner.ProbeListPluginRunner;
 import mayday.core.pluma.PluginInfo;
@@ -53,11 +54,15 @@ public class CorrelationHeat extends PlotPlugin {
         DataSet ds = new DataSet();
         MasterTable tmt = new MasterTable(ds);
         ProbeList data = new ProbeList(ds, true);
-        // Add Experiment Names
+        // Add Experiment Names + find longest column name length,
+        // needed for lexicographic ordered insertion into probe-lists
+        int nameLength = -1;
         for (int col=1; col < corMatrix.getColumnCount(); col++) {
-            tmt.addExperiment(new Experiment(tmt,
-                    corMatrix.getColumnName(col)));
-
+            String current = corMatrix.getColumnName(col);
+            tmt.addExperiment(new Experiment(tmt, current));
+            if (current.length() > nameLength) {
+                nameLength = current.length();
+            }
         }
         // iterate over matrix
         // -1 because first column is meta info
@@ -66,7 +71,11 @@ public class CorrelationHeat extends PlotPlugin {
             // create probe
             String name = (String) corMatrix.getValueAt(row, 0);
             Probe p = new Probe(tmt, false);
-            p.setName(name);
+            // right-justify name for lexi. order
+            String filledName = String.format("%" + nameLength + "s",
+                    name);
+            p.setName(filledName);
+
             data.addProbe(p);
             tmt.addProbe(p);
             // retrieve values
