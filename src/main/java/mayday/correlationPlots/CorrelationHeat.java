@@ -29,7 +29,7 @@ public class CorrelationHeat extends PlotPlugin {
     public java.util.List<ProbeList> run(java.util.List<ProbeList> probeLists,
                                          MasterTable masterTable) {
 
-        assert probeLists.size() == 0;
+        assert probeLists.size() != 0;
         final int limit = 100;
         if (probeLists.get(0).getNumberOfProbes() > limit) {
             int x = JOptionPane.showConfirmDialog(null,
