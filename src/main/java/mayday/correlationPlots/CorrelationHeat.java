@@ -64,6 +64,16 @@ public class CorrelationHeat extends PlotPlugin {
                 nameLength = current.length();
             }
         }
+        // ask user if they wish to right pad the ids
+        int diag = JOptionPane.showConfirmDialog(null,
+                "Would you like to right pad experiment identifiers?\n" +
+                "You probably want to do this if you have numeric identifiers. " +
+                "Doing so ensures that the string comparison yields '_1' < '10'." +
+                "\n(You still would have to choose sorting by identifiers from" +
+                "the view menu)",
+                "Right Padding ids?",
+                JOptionPane.YES_NO_OPTION);
+        boolean padd = diag == JOptionPane.YES_OPTION;
         // iterate over matrix
         // -1 because first column is meta info
         int nrExperiments = corMatrix.getColumnCount() - 1;
@@ -72,9 +82,13 @@ public class CorrelationHeat extends PlotPlugin {
             String name = (String) corMatrix.getValueAt(row, 0);
             Probe p = new Probe(tmt, false);
             // right-justify name for lexi. order
-            String filledName = String.format("%" + nameLength + "s",
-                    name);
-            p.setName(filledName);
+            if(padd) {
+                String filledName = String.format("%" + nameLength + "s",
+                        name);
+                p.setName(filledName);
+            } else {
+                p.setName(name);
+            }
 
             data.addProbe(p);
             tmt.addProbe(p);
